@@ -75,6 +75,27 @@ const projects = [
   },
 ];
 
+const mediaProjects = [
+  {
+    name: "rtp.io",
+    description: "RTP and RTCP protocol building blocks for real-time media systems.",
+    href: "https://github.com/sippy/rtp.io",
+    mark: "IO",
+  },
+  {
+    name: "rtp_cluster",
+    description: "Distributed RTP relay coordination and resilient media routing.",
+    href: "https://github.com/sippy/rtp_cluster",
+    mark: "RC",
+  },
+  {
+    name: "go-rtp_cluster",
+    description: "A Go implementation of the RTP cluster control layer.",
+    href: "https://github.com/sippy/go-rtp_cluster",
+    mark: "GO",
+  },
+];
+
 function ArrowIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -88,6 +109,57 @@ function GithubIcon() {
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M12 2.8a9.4 9.4 0 0 0-3 18.3c.5.1.7-.2.7-.5v-1.8c-2.8.6-3.4-1.2-3.4-1.2-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 0 1.6 1.1 1.6 1.1.9 1.6 2.4 1.1 2.9.9.1-.7.4-1.1.7-1.4-2.3-.3-4.6-1.1-4.6-4.9 0-1.1.4-2 1-2.6-.1-.3-.4-1.3.1-2.6 0 0 .8-.3 2.7 1a9.2 9.2 0 0 1 4.9 0c1.9-1.3 2.7-1 2.7-1 .5 1.3.2 2.3.1 2.6.6.7 1 1.5 1 2.6 0 3.8-2.3 4.6-4.6 4.9.4.3.7 1 .7 1.9v2.9c0 .3.2.6.7.5A9.4 9.4 0 0 0 12 2.8Z" />
     </svg>
+  );
+}
+
+function ProjectCard({
+  project,
+  index,
+}: {
+  project: (typeof projects)[number];
+  index: number;
+}) {
+  return (
+    <a
+      className={`project-card ${project.position} ${project.accent}`}
+      href={project.href}
+      target="_blank"
+      rel="noreferrer"
+      style={{ "--delay": `${index * 55}ms` } as React.CSSProperties}
+    >
+      <div className="card-topline">
+        <span className="card-mark">{project.mark}</span>
+        <span className="card-category">{project.category}</span>
+        <ArrowIcon />
+      </div>
+      <h2>{project.name}</h2>
+      <p>{project.description}</p>
+    </a>
+  );
+}
+
+function MediaSubcard({
+  project,
+  index,
+}: {
+  project: (typeof mediaProjects)[number];
+  index: number;
+}) {
+  return (
+    <a
+      className="media-subcard"
+      href={project.href}
+      target="_blank"
+      rel="noreferrer"
+      style={{ "--media-delay": `${index * 55}ms` } as React.CSSProperties}
+    >
+      <span className="media-subcard-mark">{project.mark}</span>
+      <span className="media-subcard-copy">
+        <strong>{project.name}</strong>
+        <small>{project.description}</small>
+      </span>
+      <ArrowIcon />
+    </a>
   );
 }
 
@@ -129,11 +201,18 @@ export default function Home() {
             <line x1="419" y1="375.6" x2="227" y2="218" />
             <line x1="500" y1="312" x2="500" y2="172" />
             <line x1="581" y1="375.6" x2="773" y2="218" />
-            <line x1="594.2" y1="443" x2="793" y2="445" />
             <line x1="572.7" y1="524.7" x2="753" y2="730" />
             <line x1="500" y1="572" x2="500" y2="748" />
             <line x1="427.3" y1="524.7" x2="247" y2="730" />
             <line x1="405.8" y1="443" x2="207" y2="445" />
+          </g>
+          <g
+            className="media-spoke-trigger"
+            tabIndex={0}
+            aria-label="Reveal related media projects"
+          >
+            <line className="media-spoke-line" x1="594.2" y1="443" x2="793" y2="445" />
+            <line className="media-spoke-hit" x1="594.2" y1="443" x2="793" y2="445" />
           </g>
           <g className="connector-points">
             <circle cx="227" cy="218" r="4" />
@@ -169,24 +248,30 @@ export default function Home() {
           <span className="hub-pulse" aria-hidden="true" />
         </div>
 
-        {projects.map((project, index) => (
-          <a
-            key={project.name}
-            className={`project-card ${project.position} ${project.accent}`}
-            href={project.href}
-            target="_blank"
-            rel="noreferrer"
-            style={{ "--delay": `${index * 55}ms` } as React.CSSProperties}
-          >
-            <div className="card-topline">
-              <span className="card-mark">{project.mark}</span>
-              <span className="card-category">{project.category}</span>
-              <ArrowIcon />
-            </div>
-            <h2>{project.name}</h2>
-            <p>{project.description}</p>
-          </a>
-        ))}
+        {projects.map((project, index) => {
+          if (project.position === "media") {
+            return (
+              <div className="media-stack" key={project.name}>
+                <ProjectCard project={project} index={index} />
+                <div
+                  className="media-layer"
+                  id="media-layer"
+                  aria-label="Related media projects"
+                >
+                  {mediaProjects.map((mediaProject, mediaIndex) => (
+                    <MediaSubcard
+                      key={mediaProject.name}
+                      project={mediaProject}
+                      index={mediaIndex}
+                    />
+                  ))}
+                </div>
+              </div>
+            );
+          }
+
+          return <ProjectCard key={project.name} project={project} index={index} />;
+        })}
       </section>
 
       <footer>
