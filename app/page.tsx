@@ -1,4 +1,8 @@
+"use client";
+
 /* eslint-disable @next/next/no-img-element */
+
+import { useState } from "react";
 
 const projects = [
   {
@@ -96,6 +100,64 @@ const mediaProjects = [
   },
 ];
 
+type RelatedProject = {
+  name: string;
+  description: string;
+  href: string;
+  mark: string;
+};
+
+const reliabilityProjects: RelatedProject[] = [
+  {
+    name: "libelperiodic",
+    description: "Periodic event scheduling primitives for real-time applications.",
+    href: "https://github.com/sippy/libelperiodic",
+    mark: "EP",
+  },
+  {
+    name: "librtpsynth",
+    description: "Lightweight RTP audio synthesis and media generation tools.",
+    href: "https://github.com/sippy/librtpsynth",
+    mark: "RS",
+  },
+  {
+    name: "libg722",
+    description: "A compact G.722 wideband audio codec library.",
+    href: "https://github.com/sippy/libg722",
+    mark: "G7",
+  },
+];
+
+const embeddedProjects: RelatedProject[] = [
+  {
+    name: "Digger",
+    description: "A modernized open-source port of the classic Digger game.",
+    href: "https://github.com/sobomax/digger",
+    mark: "D",
+  },
+];
+
+const aiProjects: RelatedProject[] = [
+  {
+    name: "g729_to_dtmf.ai",
+    description: "Training pipeline for detecting DTMF directly from G.729 frames.",
+    href: "https://github.com/sobomax/g729_to_dtmf.ai",
+    mark: "DT",
+  },
+  {
+    name: "Post-vocoder v1",
+    description: "First-generation real-time SpeechT5 post-vocoder helper model.",
+    href: "https://huggingface.co/sobomax/speecht5-rt.post_vocoder.v1",
+    mark: "V1",
+  },
+  {
+    name: "Post-vocoder v2",
+    description: "Updated SpeechT5 post-vocoder helper model for real-time speech.",
+    href: "https://huggingface.co/sobomax/speecht5-rt.post_vocoder.v2",
+    mark: "V2",
+  },
+];
+
 function ArrowIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -115,9 +177,13 @@ function GithubIcon() {
 function ProjectCard({
   project,
   index,
+  onClick,
+  expanded,
 }: {
   project: (typeof projects)[number];
   index: number;
+  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
+  expanded?: boolean;
 }) {
   return (
     <a
@@ -126,6 +192,9 @@ function ProjectCard({
       target="_blank"
       rel="noreferrer"
       style={{ "--delay": `${index * 55}ms` } as React.CSSProperties}
+      onClick={onClick}
+      aria-expanded={expanded}
+      aria-controls={expanded === undefined ? undefined : "media-layer"}
     >
       <div className="card-topline">
         <span className="card-mark">{project.mark}</span>
@@ -142,7 +211,7 @@ function MediaSubcard({
   project,
   index,
 }: {
-  project: (typeof mediaProjects)[number];
+  project: RelatedProject;
   index: number;
 }) {
   return (
@@ -164,6 +233,11 @@ function MediaSubcard({
 }
 
 export default function Home() {
+  const [mediaExpanded, setMediaExpanded] = useState(false);
+  const [reliabilityExpanded, setReliabilityExpanded] = useState(false);
+  const [embeddedExpanded, setEmbeddedExpanded] = useState(false);
+  const [aiExpanded, setAiExpanded] = useState(false);
+
   return (
     <main>
       <header className="site-header">
@@ -198,13 +272,19 @@ export default function Home() {
           aria-hidden="true"
         >
           <g className="connector-strokes">
-            <line x1="419" y1="375.6" x2="227" y2="218" />
             <line x1="500" y1="312" x2="500" y2="172" />
-            <line x1="581" y1="375.6" x2="773" y2="218" />
             <line x1="572.7" y1="524.7" x2="753" y2="730" />
             <line x1="500" y1="572" x2="500" y2="748" />
             <line x1="427.3" y1="524.7" x2="247" y2="730" />
             <line x1="405.8" y1="443" x2="207" y2="445" />
+          </g>
+          <g
+            className="reliability-spoke-trigger"
+            tabIndex={0}
+            aria-label="Reveal related Sippy B2BUA libraries"
+          >
+            <line className="reliability-spoke-line" x1="419" y1="375.6" x2="227" y2="218" />
+            <line className="reliability-spoke-hit" x1="419" y1="375.6" x2="227" y2="218" />
           </g>
           <g
             className="media-spoke-trigger"
@@ -213,6 +293,14 @@ export default function Home() {
           >
             <line className="media-spoke-line" x1="594.2" y1="443" x2="793" y2="445" />
             <line className="media-spoke-hit" x1="594.2" y1="443" x2="793" y2="445" />
+          </g>
+          <g
+            className="ai-spoke-trigger"
+            tabIndex={0}
+            aria-label="Reveal related AI projects"
+          >
+            <line className="media-spoke-line" x1="581" y1="375.6" x2="773" y2="218" />
+            <line className="media-spoke-hit" x1="581" y1="375.6" x2="773" y2="218" />
           </g>
           <g className="connector-points">
             <circle cx="227" cy="218" r="4" />
@@ -249,13 +337,150 @@ export default function Home() {
         </div>
 
         {projects.map((project, index) => {
-          if (project.position === "media") {
-            return (
-              <div className="media-stack" key={project.name}>
+          if (project.position === "reliability") {
+            return [
+              <div className="reliability-stack desktop-reliability-stack" key="reliability-desktop">
                 <ProjectCard project={project} index={index} />
                 <div
+                  className="reliability-layer"
+                  id="desktop-reliability-layer"
+                  aria-label="Related Sippy B2BUA libraries"
+                >
+                  {reliabilityProjects.map((relatedProject, relatedIndex) => (
+                    <MediaSubcard
+                      key={relatedProject.name}
+                      project={relatedProject}
+                      index={relatedIndex}
+                    />
+                  ))}
+                </div>
+              </div>,
+              <div
+                className={`mobile-media-stack mobile-reliability-stack${reliabilityExpanded ? " media-open" : ""}`}
+                key="reliability-mobile"
+              >
+                <div
+                  className={`project-card ${project.position} ${project.accent} mobile-media-toggle-card`}
+                  style={{ "--delay": `${index * 55}ms` } as React.CSSProperties}
+                >
+                  <div className="card-topline">
+                    <span className="card-mark">{project.mark}</span>
+                    <span className="card-category">{project.category}</span>
+                    <a
+                      className="mobile-media-repo-link"
+                      href={project.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label="Open Sippy B2BUA on GitHub"
+                    >
+                      <ArrowIcon />
+                    </a>
+                  </div>
+                  <h2>{project.name}</h2>
+                  <p>{project.description}</p>
+                  <button
+                    className="mobile-media-toggle-hit"
+                    type="button"
+                    aria-label={reliabilityExpanded ? "Hide related Sippy B2BUA libraries" : "Show related Sippy B2BUA libraries"}
+                    aria-expanded={reliabilityExpanded}
+                    aria-controls="mobile-reliability-layer"
+                    onClick={() => setReliabilityExpanded((isExpanded) => !isExpanded)}
+                  />
+                </div>
+                <div
                   className="media-layer"
-                  id="media-layer"
+                  id="mobile-reliability-layer"
+                  aria-label="Related Sippy B2BUA libraries"
+                >
+                  {reliabilityProjects.map((relatedProject, relatedIndex) => (
+                    <MediaSubcard
+                      key={relatedProject.name}
+                      project={relatedProject}
+                      index={relatedIndex}
+                    />
+                  ))}
+                </div>
+              </div>,
+            ];
+          }
+
+          if (project.position === "ai") {
+            return [
+              <div className="ai-stack desktop-ai-stack" key="ai-desktop">
+                <ProjectCard project={project} index={index} />
+                <div
+                  className="reliability-layer ai-layer"
+                  id="desktop-ai-layer"
+                  aria-label="Related AI projects"
+                >
+                  {aiProjects.map((relatedProject, relatedIndex) => (
+                    <MediaSubcard
+                      key={relatedProject.name}
+                      project={relatedProject}
+                      index={relatedIndex}
+                    />
+                  ))}
+                </div>
+              </div>,
+              <div
+                className={`mobile-media-stack mobile-ai-stack${aiExpanded ? " media-open" : ""}`}
+                key="ai-mobile"
+              >
+                <div
+                  className={`project-card ${project.position} ${project.accent} mobile-media-toggle-card`}
+                  style={{ "--delay": `${index * 55}ms` } as React.CSSProperties}
+                >
+                  <div className="card-topline">
+                    <span className="card-mark">{project.mark}</span>
+                    <span className="card-category">{project.category}</span>
+                    <a
+                      className="mobile-media-repo-link"
+                      href={project.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label="Open Infernos on GitHub"
+                    >
+                      <ArrowIcon />
+                    </a>
+                  </div>
+                  <h2>{project.name}</h2>
+                  <p>{project.description}</p>
+                  <button
+                    className="mobile-media-toggle-hit"
+                    type="button"
+                    aria-label={aiExpanded ? "Hide related AI projects" : "Show related AI projects"}
+                    aria-expanded={aiExpanded}
+                    aria-controls="mobile-ai-layer"
+                    onClick={() => setAiExpanded((isExpanded) => !isExpanded)}
+                  />
+                </div>
+                <div
+                  className="media-layer"
+                  id="mobile-ai-layer"
+                  aria-label="Related AI projects"
+                >
+                  {aiProjects.map((relatedProject, relatedIndex) => (
+                    <MediaSubcard
+                      key={relatedProject.name}
+                      project={relatedProject}
+                      index={relatedIndex}
+                    />
+                  ))}
+                </div>
+              </div>,
+            ];
+          }
+
+          if (project.position === "media") {
+            return [
+              <div className="media-stack desktop-media-stack" key="media-desktop">
+                <ProjectCard
+                  project={project}
+                  index={index}
+                />
+                <div
+                  className="media-layer"
+                  id="desktop-media-layer"
                   aria-label="Related media projects"
                 >
                   {mediaProjects.map((mediaProject, mediaIndex) => (
@@ -266,8 +491,121 @@ export default function Home() {
                     />
                   ))}
                 </div>
-              </div>
-            );
+              </div>,
+              <div
+                className={`mobile-media-stack${mediaExpanded ? " media-open" : ""}`}
+                key="media-mobile"
+              >
+                <div
+                  className={`project-card ${project.position} ${project.accent} mobile-media-toggle-card`}
+                  style={{ "--delay": `${index * 55}ms` } as React.CSSProperties}
+                >
+                  <div className="card-topline">
+                    <span className="card-mark">{project.mark}</span>
+                    <span className="card-category">{project.category}</span>
+                    <a
+                      className="mobile-media-repo-link"
+                      href={project.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label="Open RTPProxy on GitHub"
+                    >
+                      <ArrowIcon />
+                    </a>
+                  </div>
+                  <h2>{project.name}</h2>
+                  <p>{project.description}</p>
+                  <button
+                    className="mobile-media-toggle-hit"
+                    type="button"
+                    aria-label={mediaExpanded ? "Hide related media projects" : "Show related media projects"}
+                    aria-expanded={mediaExpanded}
+                    aria-controls="mobile-media-layer"
+                    onClick={() => setMediaExpanded((isExpanded) => !isExpanded)}
+                  />
+                </div>
+                <div
+                  className="media-layer"
+                  id="mobile-media-layer"
+                  aria-label="Related media projects"
+                >
+                  {mediaProjects.map((mediaProject, mediaIndex) => (
+                    <MediaSubcard
+                      key={mediaProject.name}
+                      project={mediaProject}
+                      index={mediaIndex}
+                    />
+                  ))}
+                </div>
+              </div>,
+            ];
+          }
+
+          if (project.position === "embedded") {
+            return [
+              <div className="embedded-stack desktop-embedded-stack" key="embedded-desktop">
+                <ProjectCard project={project} index={index} />
+                <div
+                  className="embedded-layer"
+                  id="desktop-embedded-layer"
+                  aria-label="Related MicroSippy projects"
+                >
+                  {embeddedProjects.map((relatedProject, relatedIndex) => (
+                    <MediaSubcard
+                      key={relatedProject.name}
+                      project={relatedProject}
+                      index={relatedIndex}
+                    />
+                  ))}
+                </div>
+              </div>,
+              <div
+                className={`mobile-media-stack mobile-embedded-stack${embeddedExpanded ? " media-open" : ""}`}
+                key="embedded-mobile"
+              >
+                <div
+                  className={`project-card ${project.position} ${project.accent} mobile-media-toggle-card`}
+                  style={{ "--delay": `${index * 55}ms` } as React.CSSProperties}
+                >
+                  <div className="card-topline">
+                    <span className="card-mark">{project.mark}</span>
+                    <span className="card-category">{project.category}</span>
+                    <a
+                      className="mobile-media-repo-link"
+                      href={project.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label="Open MicroSippy on GitHub"
+                    >
+                      <ArrowIcon />
+                    </a>
+                  </div>
+                  <h2>{project.name}</h2>
+                  <p>{project.description}</p>
+                  <button
+                    className="mobile-media-toggle-hit"
+                    type="button"
+                    aria-label={embeddedExpanded ? "Hide related MicroSippy projects" : "Show related MicroSippy projects"}
+                    aria-expanded={embeddedExpanded}
+                    aria-controls="mobile-embedded-layer"
+                    onClick={() => setEmbeddedExpanded((isExpanded) => !isExpanded)}
+                  />
+                </div>
+                <div
+                  className="media-layer"
+                  id="mobile-embedded-layer"
+                  aria-label="Related MicroSippy projects"
+                >
+                  {embeddedProjects.map((relatedProject, relatedIndex) => (
+                    <MediaSubcard
+                      key={relatedProject.name}
+                      project={relatedProject}
+                      index={relatedIndex}
+                    />
+                  ))}
+                </div>
+              </div>,
+            ];
           }
 
           return <ProjectCard key={project.name} project={project} index={index} />;
