@@ -219,6 +219,178 @@ a { color: inherit; text-decoration: none; }
   opacity: .88;
 }
 
+.media-spoke-trigger {
+  cursor: pointer;
+  outline: none;
+}
+
+.media-spoke-line {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 1;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  transition: stroke .2s ease, stroke-width .2s ease;
+}
+
+.media-spoke-hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 24;
+  pointer-events: stroke;
+  vector-effect: non-scaling-stroke;
+}
+
+.media-spoke-trigger:hover .media-spoke-line,
+.media-spoke-trigger:focus .media-spoke-line {
+  stroke: #d47d19;
+  stroke-width: 2;
+}
+
+.media-stack {
+  position: absolute;
+  z-index: 2;
+  right: 0;
+  top: 39%;
+  width: 286px;
+}
+
+.media-stack > .media {
+  position: relative;
+  inset: auto;
+}
+
+.media-layer {
+  position: absolute;
+  z-index: 5;
+  right: calc(100% + 24px);
+  top: 50%;
+  width: 244px;
+  display: grid;
+  gap: 10px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(18px, -50%) scale(.97);
+  transform-origin: right center;
+  transition: opacity .2s ease, transform .24s cubic-bezier(.2, .75, .25, 1);
+}
+
+.media-layer::after {
+  content: "";
+  position: absolute;
+  left: 100%;
+  top: 0;
+  bottom: 0;
+  width: 24px;
+}
+
+.media-stack:hover,
+.media-stack:focus-within,
+.project-map:has(.media-spoke-trigger:hover) .media-stack,
+.project-map:has(.media-spoke-trigger:focus) .media-stack {
+  z-index: 6;
+}
+
+.media-stack:hover .media-layer,
+.media-stack:focus-within .media-layer,
+.project-map:has(.media-spoke-trigger:hover) .media-layer,
+.project-map:has(.media-spoke-trigger:focus) .media-layer {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(0, -50%) scale(1);
+}
+
+.media-subcard {
+  --accent: #a65a22;
+  position: relative;
+  min-height: 86px;
+  padding: 13px 13px 13px 14px;
+  border: 1px solid rgba(166, 90, 34, .25);
+  border-radius: 13px;
+  display: grid;
+  grid-template-columns: 31px minmax(0, 1fr) 17px;
+  gap: 10px;
+  align-items: center;
+  background: rgba(255, 250, 242, .96);
+  box-shadow: 0 14px 34px rgba(103, 63, 23, .13);
+  opacity: 0;
+  transform: translateX(14px);
+  transition:
+    opacity .2s ease var(--media-delay),
+    transform .24s cubic-bezier(.2, .75, .25, 1) var(--media-delay),
+    border-color .2s ease,
+    box-shadow .2s ease;
+}
+
+.media-subcard::after {
+  content: "";
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  width: 24px;
+  height: 1px;
+  background: var(--line);
+}
+
+.media-stack:hover .media-subcard,
+.media-stack:focus-within .media-subcard,
+.project-map:has(.media-spoke-trigger:hover) .media-subcard,
+.project-map:has(.media-spoke-trigger:focus) .media-subcard {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.media-subcard:hover,
+.media-subcard:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 17px 38px rgba(103, 63, 23, .19);
+  outline: none;
+}
+
+.media-subcard-mark {
+  width: 31px;
+  height: 31px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  color: white;
+  background: var(--accent);
+  font: 700 9px/1 var(--font-geist-mono), monospace;
+}
+
+.media-subcard-copy {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.media-subcard-copy strong {
+  font: 650 14px/1.1 var(--font-geist-sans), sans-serif;
+  letter-spacing: -.025em;
+}
+
+.media-subcard-copy small {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.3;
+}
+
+.media-subcard svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform .2s ease;
+}
+
+.media-subcard:hover svg,
+.media-subcard:focus-visible svg {
+  transform: translate(2px, -2px);
+}
+
 .project-card {
   --accent: #e2553f;
   position: absolute;
@@ -388,6 +560,32 @@ footer a { color: var(--ink); }
   .project-card:hover, .project-card:focus-visible,
   .performance:hover, .performance:focus-visible,
   .automation:hover, .automation:focus-visible { transform: translateY(-3px); }
+  .media-stack {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    z-index: 2;
+  }
+  .media-stack > .media {
+    width: 100%;
+    min-height: 178px;
+  }
+  .media-layer {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    margin-top: 10px;
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
+  .media-layer::after,
+  .media-subcard::after { display: none; }
+  .media-subcard {
+    min-height: 82px;
+    opacity: 1;
+    transform: none;
+  }
   footer { margin: 60px 20px 0; padding: 30px 12px; }
 }
 
